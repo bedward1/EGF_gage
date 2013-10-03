@@ -1,0 +1,21 @@
+{
+    "contents" : "",
+    "created" : 1380734196474.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3CDAC365",
+    "lastKnownWriteTime" : 1380733478,
+    "path" : null,
+    "properties" : {
+        "caption" : "response.var.range",
+        "contentUrl" : "content?title=response.var.range&file=732f89648d7d438aaf1ad1ef97746b26.htm",
+        "displayedObservations" : 12,
+        "displayedVariables" : 2,
+        "totalObservations" : 12,
+        "variables" : 2
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

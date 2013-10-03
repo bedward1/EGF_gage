@@ -1,0 +1,21 @@
+{
+    "contents" : "",
+    "created" : 1380734804734.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "28B66875",
+    "lastKnownWriteTime" : 732161895852960000,
+    "path" : null,
+    "properties" : {
+        "caption" : "data.G1",
+        "contentUrl" : "content?title=data.G1&file=1426dbaebb4d47a88cdc4e1ed7263322.htm",
+        "displayedObservations" : "1000",
+        "displayedVariables" : 14,
+        "totalObservations" : "11979",
+        "variables" : "12"
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

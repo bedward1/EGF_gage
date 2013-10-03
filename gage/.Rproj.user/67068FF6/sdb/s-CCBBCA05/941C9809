@@ -1,0 +1,21 @@
+{
+    "contents" : "",
+    "created" : 1380737138256.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "941C9809",
+    "lastKnownWriteTime" : 1,
+    "path" : null,
+    "properties" : {
+        "caption" : "egSymb",
+        "contentUrl" : "content?title=egSymb&file=5d17905e7252478aa1cf257954fc37fe.htm",
+        "displayedObservations" : 1000,
+        "displayedVariables" : 2,
+        "totalObservations" : 40784,
+        "variables" : 2
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

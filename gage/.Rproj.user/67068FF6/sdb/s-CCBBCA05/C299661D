@@ -1,0 +1,16 @@
+{
+    "contents" : "Gage pipeline, Step I- calcs\n========================================================\nStarted: Bryan Linggi October 2, 2013  \nUpdated:  \nInput: Preprocessed data. 'Preproccessing.Rdata' from 'munge' fold  \nOutput: results of gage      \n\n[link to Gage manuscript](http://www.biomedcentral.com/1471-2105/10/161) \n\n`r require(gage) `\n\n### Get pathway library   \nif is new pathway library, make in separate script and test\n```{r}\nsetwd('~/Documents/R_onAir/GageAnalysis/reports/')\ndata(kegg.gs)\n# make library generic for next steps\npath.lib = kegg.gs\n```\n\n### Import data\n```{r} \nload('~/Documents/R_onAir/GageAnalysis/munge/Preprocessed.Rdata')\n# make data generic for next steps\n# WARNING: row names and data must be correct for the next line\ndata.G1 = as.matrix(ws[,2:13]) \n#identify control and test column for comparison\n\ncontrol.idx = grep('HN',colnames(data.G1),ignore.case=T)\ntest.idx = grep('DCIS',colnames(data.G1),ignore.case=T)\n#check\ncheck.control =print(colnames(data.G1[control.idx]))\ncheck.treatment = print(colnames(data.G1[test.idx]))\n```\n** gernalized from here on **\n\n#### Gage analysis\n```{r}\n#options: called answers\nans.same.dir = F\nans.use.fold = T # or F is t-statistic\nans.rank.test = T\nans.ref = control.idx\nans.samp = test.idx\nans.saaTest = gs.KSTest # non-parametric\nans.sam = 'unpaired' # or 'paried'\nans.use.stouffer= T # p-value normalization method\nans.compare = 'paired' # 'paired', 'unpaired', '1ongroup','as.group'\n\nanalysis.1 <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, same.dir=ans.same.dir, use.fold= ans.use.fold, rank.test= ans.rank.test, saaTest = ans.saaTest, compare= ans.compare, use.stouffer=ans.use.stouffer)\n```\n### output\n#### text output to /report location. change name as necessary\n\n```{r} \n# output data results to file\nwrite.table(analysis.1$greater, file = '~/Documents/R_onAir/GageAnalysis/reports/test_sample_gage.xls', sep =\"\\t\") `\n\n#create heatmap, heatmap-sends to local /reports folder\n summary.regulated = sigGeneSet(analysis.1, heatmap=1, pdf.size=c(8,8), qpval= 'q.val',  cutoff=.01) #TODO change formatting of heatmap\n\n#heatmap of genes that change in each gene list \n#pick how many to print\nprint.top = 3\ngenes.print=unique(unlist(path.lib[rownames(analysis.1$greater)[1:print.top]]))\ngenes.print.data=essGene(genes.print, data.G1, ref =ans.ref, samp = ans.samp)\n\n```\n\n\n\n\n### identify gene sets (pathways) that overlap in their core genes   \nCore gene sets are those that contribute most to the identification of the gene set as signifiant   \n\n# need t use same input as as for 'gage' call\nanalysis.esg.up <- esset.grp(analysis.1$greater,data.G1, gsets =kegg.gs, ref = ans.ref, samp = ans.samp,test4up = T, same.dir=ans.same.dir, output = T, outname = \"test\", make.plot = T, compare = ans.compare)\nnames(kegg.gs)\nnames(analysis.esg.up)\nanalysis.esg.up$setGroups\n\nhead(analy)",
+    "created" : 1380733135355.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3249269775",
+    "id" : "C299661D",
+    "lastKnownWriteTime" : 1380841290,
+    "path" : "~/Documents/R_onAir/GageAnalysis/src/gage_step1.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_markdown"
+}

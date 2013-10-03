@@ -1,0 +1,72 @@
+Gage pipeline, Step I- calcs
+========================================================
+Started: Bryan Linggi October 2, 2013  
+Updated:  
+Input: Preprocessed data. 'Preproccessing.Rdata' from 'munge' fold  
+Output: results of gage      
+
+[link to Gage manuscript](http://www.biomedcentral.com/1471-2105/10/161) 
+
+`r require(gage) `
+
+### Get pathway library   
+if is new pathway library, make in separate script and test
+```{r}
+setwd('~/Documents/R_onAir/GageAnalysis/reports/')
+data(kegg.gs)
+# make library generic for next steps
+path.lib = kegg.gs
+```
+
+### Import data
+```{r} 
+load('~/Documents/R_onAir/GageAnalysis/munge/Preprocessed.Rdata')
+# make data generic for next steps
+# WARNING: row names and data must be correct for the next line
+data.G1 = as.matrix(ws[,2:13]) 
+#identify control and test column for comparison
+
+control.idx = grep('HN',colnames(data.G1),ignore.case=T)
+test.idx = grep('DCIS',colnames(data.G1),ignore.case=T)
+#check
+check.control =print(colnames(data.G1[control.idx]))
+check.treatment = print(colnames(data.G1[test.idx]))
+```
+** gernalized from here on **
+
+#### Gage analysis
+```{r}
+#options: called answers
+ans.same.dir = F
+ans.use.fold = T # or F is t-statistic
+ans.rank.test = T
+ans.ref = control.idx
+ans.samp = test.idx
+ans.saaTest = gs.KSTest # non-parametric
+ans.sam = 'unpaired' # or 'paried'
+ans.use.stouffer= T # p-value normalization method
+ans.compare = 'paired' # 'paired', 'unpaired', '1ongroup','as.group'
+
+analysis.1 <- gage(data.G1, gsets = kegg.gs, ref = ans.ref, samp = ans.samp, same.dir=ans.same.dir, use.fold= ans.use.fold, rank.test= ans.rank.test, saaTest = ans.saaTest, compare= ans.compare, use.stouffer=ans.use.stouffer)
+```
+### output
+#### text output to /report location. change name as necessary
+
+```{r} 
+# output data results to file
+write.table(analysis.1$greater, file = '~/Documents/R_onAir/GageAnalysis/reports/test_sample_gage.xls', sep ="\t") `
+
+#### create heatpam, heatmap-sends to local /reports folder
+ summary.regulated = sigGeneSet(analysis.1, heatmap=1, pdf.size=c(8,8), qpval= 'q.val',  cutoff=.01) #TODO change formatting of heatmap
+```
+
+### identify gene sets (pathways) that overlap in their core genes   
+Core gene sets are those that contribute most to the identification of the gene set as signifiant   
+
+# need t use same input as as for 'gage' call
+analysis.esg.up <- esset.grp(analysis.1$greater,data.G1, gsets =kegg.gs, ref = ans.ref, samp = ans.samp,test4up = T, same.dir=ans.same.dir, output = T, outname = "test", make.plot = T, compare = ans.compare)
+names(kegg.gs)
+names(analysis.esg.up)
+analysis.esg.up$setGroups
+
+head(analy)

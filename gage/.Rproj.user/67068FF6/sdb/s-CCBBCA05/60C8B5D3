@@ -1,0 +1,21 @@
+{
+    "contents" : "",
+    "created" : 1380734807113.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "60C8B5D3",
+    "lastKnownWriteTime" : 140411070775296,
+    "path" : null,
+    "properties" : {
+        "caption" : "gse16873",
+        "contentUrl" : "content?title=gse16873&file=e1d7bcefb6774e0eb6dd7507ebaa25cc.htm",
+        "displayedObservations" : "1000",
+        "displayedVariables" : 13,
+        "totalObservations" : "11979",
+        "variables" : "12"
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

@@ -1,0 +1,21 @@
+{
+    "contents" : "",
+    "created" : 1380841831652.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "ED90125",
+    "lastKnownWriteTime" : 7587266184633216000,
+    "path" : null,
+    "properties" : {
+        "caption" : "genes.print.data",
+        "contentUrl" : "content?title=genes.print.data&file=d6b51796222d4e4aa276a5015d9e5bed.htm",
+        "displayedObservations" : 94,
+        "displayedVariables" : 13,
+        "totalObservations" : 94,
+        "variables" : 12
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}

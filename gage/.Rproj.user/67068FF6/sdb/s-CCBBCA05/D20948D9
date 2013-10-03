@@ -1,0 +1,21 @@
+{
+    "contents" : "",
+    "created" : 1380735008511.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D20948D9",
+    "lastKnownWriteTime" : 140409378905856,
+    "path" : null,
+    "properties" : {
+        "caption" : "ws.prepocessed",
+        "contentUrl" : "content?title=ws.prepocessed&file=0626a27f92df4e718d93be557d899faa.htm",
+        "displayedObservations" : 1000,
+        "displayedVariables" : 12,
+        "totalObservations" : 11979,
+        "variables" : 12
+    },
+    "source_on_save" : false,
+    "type" : "r_dataframe"
+}
