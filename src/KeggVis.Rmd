@@ -23,11 +23,12 @@ setwd('~/Documents/R_onAir/GageAnalysis/graphs/')
 
 # enter as many as I want to graph
 # input is from gage_step1.Rmd
-ans.path.ids = c(analysis.esg.up$essentialSets[[1]],analysis.esg.up$essentialSets[[2]])
+setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis/graphs/high_dens/')
+ans.path.ids = c(analysis.esg.greater$essentialSets[[1]],analysis.esg.greater$essentialSets[[2]],analysis.esg.greater$essentialSets[[3]])
 path.ids=ans.path.ids
 path.ids2 <- substr(path.ids, 1, 8)
 #native KEGG view
-ans.kegg.native = F # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+ans.kegg.native = T # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
 require(pathview)
 # get differences compared to control
 data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
