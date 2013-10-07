@@ -14,7 +14,6 @@ load('~/Documents/R_onAir/GageAnalysis/src/gageS1_output.Rdata')
 
 # convert entrez to symbol
 
-
 #create heatmap, heatmap-sends to local /reports folder
  summary.regulated = sigGeneSet(analysis.1, heatmap=1, pdf.size=c(8,8), qpval= 'q.val',  cutoff=.01) #TODO change formatting of heatmap
 
@@ -23,12 +22,10 @@ load('~/Documents/R_onAir/GageAnalysis/src/gageS1_output.Rdata')
 print.top = 3
 
 genes.print=unique(unlist(path.lib[rownames(analysis.1$greater)[1:print.top]]))
-genes.print.data=essGene(genes.print, data.G1, ref =ans.ref, samp = ans.samp)
+genes.print.data = essGene(genes.print, data.G1, ref =ans.ref, samp = ans.samp)
 for (gs in rownames(analysis.1$greater)[1:print.top]) {
   outname = gs
   # numbering of these colums is different from original. Refs are 1st half, samples are second half******check this for each expt
-  geneData(genes = path.lib[[gs]], exprs = genes.print.data, ref = 1:(ncol(data.G1)/2),,
-         samp = (ncol(data.G1)/2+1) : ncol(data.G1), txt = T, heatmap = T,
-         Colv = F, Rowv = F, dendrogram = "none", outname=gs, limit = 3, scatterplot = F)
-  
+  geneData(genes = path.lib[[gs]], exprs = genes.print.data, ref = ans.ref,
+         samp = ans.samp, txt = T, heatmap = T,Colv = F, Rowv = F, dendrogram = "none", outname=gs, limit = 3, scatterplot = F)  
 }

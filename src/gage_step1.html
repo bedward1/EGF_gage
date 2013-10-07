@@ -182,7 +182,7 @@ hljs.initHighlightingOnLoad();
 
 <p>Started: Bryan Linggi October 2, 2013<br/>
 Updated:<br/>
-Input: Preprocessed data. &#39;Preproccessing.Rdata&#39; from &#39;munge&#39; fold<br/>
+Input: Preprocessed data. &#39;Preproc.Rdata&#39; from &#39;diagnostics&#39;<br/>
 Output: results of gage      </p>
 
 <p><a href="http://www.biomedcentral.com/1471-2105/10/161">link to Gage manuscript</a> </p>
@@ -191,59 +191,85 @@ Output: results of gage      </p>
 
 <p>if is new pathway library, make in separate script and test</p>
 
-<pre><code class="r">setwd(&quot;~/Documents/R_onAir/GageAnalysis/&quot;)
-data(kegg.gs)
-# make library generic for next steps
-path.lib = kegg.gs
+<pre><code class="r">setwd(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/&quot;)
+
+require(&quot;gage&quot;)
 </code></pre>
 
-<h3>Import data</h3>
+<pre><code>## Loading required package: gage
+</code></pre>
 
-<pre><code class="r">load(&quot;~/Documents/R_onAir/GageAnalysis/munge/Preprocessed.Rdata&quot;)
+<pre><code class="r">
+data(go.gs)
+data(kegg.gs)
+data(egSymb)
+# make library generic for next steps
+path.lib = kegg.gs  #kegg.gs
+# convert entrez to sym
+
+path.lib = lapply(path.lib, eg2sym)
+</code></pre>
+
+<h3>Import data from preproccessing folder</h3>
+
+<pre><code class="r">load(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/init_analysis_output.Rdata&quot;)
+
 # make data generic for next steps WARNING: row names and data must be
 # correct for the next line
-data.G1 = as.matrix(ws[, 2:13])
+
+# for this data, need to get rid of bracketint &#39; &#39; &#39;
+row.names(ws) = sub(&quot;&#39;&quot;, &quot;&quot;, sub(&quot;&#39;&quot;, &quot;&quot;, row.names(ws)))
+data.G1 = as.matrix(ws)
+
 # identify control and test column for comparison
-
-control.idx = grep(&quot;HN&quot;, colnames(data.G1), ignore.case = T)
-test.idx = grep(&quot;DCIS&quot;, colnames(data.G1), ignore.case = T)
+control.idx = grep(&quot;low.ctrl.none&quot;, colnames(data.G1), ignore.case = T)
+test.idx = grep(&quot;low.egf.none&quot;, colnames(data.G1), ignore.case = T)
 # check
-check.control = print(colnames(data.G1[control.idx]))
+check.control = print(colnames(data.G1)[control.idx])
 </code></pre>
 
-<pre><code>## NULL
+<pre><code>## [1] &quot;low.ctrl.none.1&quot; &quot;low.ctrl.none&quot;
 </code></pre>
 
-<pre><code class="r">check.treatment = print(colnames(data.G1[test.idx]))
+<pre><code class="r">check.treatment = print(colnames(data.G1)[test.idx])
 </code></pre>
 
-<pre><code>## NULL
+<pre><code>## [1] &quot;low.egf.none&quot;   &quot;low.egf.none.1&quot;
 </code></pre>
 
 <p>** gernalized from here on **</p>
 
 <h4>Gage analysis</h4>
 
-<pre><code class="r"># options:
+<pre><code class="r"># options: called answers
 ans.same.dir = T
-ans.use.fold = T
-ans.rank.test = T
-ref.ans = control.idx
-samp.ans = test.idx
-saaTest.ans = gs.KSTest  # non-parametric
-compare.ans = &quot;unpaired&quot;  # or &#39;paried&#39;
-use.stouffer.ans = T  # p-value normalization method
+ans.use.fold = T  # or F is t-statistic
+ans.rank.test = F
+ans.ref = control.idx
+ans.samp = test.idx
+ans.saaTest = gs.KSTest  # non-parametric
+ans.use.stouffer = T  # p-value normalization method
+ans.compare = &quot;unpaired&quot;  # &#39;paired&#39;, &#39;unpaired&#39;, &#39;1ongroup&#39;,&#39;as.group&#39;
 
-analysis.1 &lt;- gage(data.G1, gsets = kegg.gs, ref = ref.ans, samp = samp.ans, 
+analysis.1 &lt;- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, 
     same.dir = ans.same.dir, use.fold = ans.use.fold, rank.test = ans.rank.test, 
-    saaTest = saaTest.ans, compare = compare.ans, use.stouffer = use.stouffer.ans)
+    saaTest = ans.saaTest, compare = ans.compare, use.stouffer = ans.use.stouffer)
 </code></pre>
 
 <h3>output</h3>
 
 <h4>text output to /report location. change name as necessary</h4>
 
-<h4>heatmap</h4>
+<pre><code class="r"># output primary analysis data results to file, TODO, create labels
+
+write.table(rbind(analysis.1$greater, analysis.1$less), file = &quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/samedir_fold_unpaird_egf.xls&quot;, 
+    sep = &quot;\t&quot;)
+</code></pre>
+
+<p>#save to allow load for next steps</p>
+
+<pre><code class="r">save.image(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/gageS1_output.Rdata &quot;)
+</code></pre>
 
 </body>
 

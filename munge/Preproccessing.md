@@ -10,7 +10,7 @@ text in **Bold** indicates things to note or follow up on
 1.Perform initial preprocessing steps to get rid of any errors in data gathering or collection.  
 2.Perform quality checks      
 
-executed: Mon Oct  7 10:45:36 2013
+executed: Mon Oct  7 15:12:38 2013
   
 input, raw .xls file 'ws'    
 output, ws.preprocessed    

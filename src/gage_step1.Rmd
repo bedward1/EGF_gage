@@ -27,34 +27,41 @@ path.lib = lapply(path.lib,eg2sym)
 
 ### Import data from preproccessing folder
 ```{r} 
-load('diagnostics/Preproc.Rdata')
+load('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/init_analysis_output.Rdata')
 
 # make data generic for next steps
 # WARNING: row names and data must be correct for the next line
-data.G1 = as.matrix(ws[,]) 
-#identify control and test column for comparison
 
-control.idx = grep('',colnames(data.G1),ignore.case=T)
-test.idx = grep('DCIS',colnames(data.G1),ignore.case=T)
+#for this data, need to get rid of bracketint " ' "
+ row.names(ws)= sub('\'','',sub('\'','',row.names(ws)))
+data.G1 = as.matrix(ws) 
+
+#identify control and test column for comparison
+control.idx = grep('low.ctrl.none',colnames(data.G1),ignore.case=T)
+test.idx = grep('low.egf.none',colnames(data.G1),ignore.case=T)
 #check
-check.control =print(colnames(data.G1[control.idx]))
-check.treatment = print(colnames(data.G1[test.idx]))
+check.control =print(colnames(data.G1)[control.idx])
+check.treatment = print(colnames(data.G1)[test.idx])
 ```
 ** gernalized from here on **
 
 #### Gage analysis
 ```{r}
 #options: called answers
-ans.same.dir = F
+ans.same.dir = T
 ans.use.fold = F # or F is t-statistic
 ans.rank.test = F
 ans.ref = control.idx
 ans.samp = test.idx
 ans.saaTest = gs.KSTest # non-parametric
 ans.use.stouffer= T # p-value normalization method
-ans.compare = 'paired' # 'paired', 'unpaired', '1ongroup','as.group'
+ans.compare = 'unpaired' # 'paired', 'unpaired', '1ongroup','as.group'
 
 analysis.1 <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, same.dir=ans.same.dir, use.fold= ans.use.fold, rank.test= ans.rank.test, saaTest = ans.saaTest, compare= ans.compare, use.stouffer=ans.use.stouffer)
+
+# to select essential genes in group
+analysis.esg.up <- esset.grp(analysis.1$greater, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold)
+
 ```
 ### output
 #### text output to /report location. change name as necessary
@@ -62,11 +69,12 @@ analysis.1 <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, sa
 ```{r} 
 # output primary analysis data results to file, TODO, create labels
 
-write.table(rbind(analysis.1$greater, analysis.1$less), file = '~/Documents/R_onAir/GageAnalysis/reports/test_sample_GO_gage.xls', sep ="\t") 
+write.table(rbind(analysis.1$greater), file = '/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/out.xls', sep ="\t") 
 ```
 
 #save to allow load for next steps
-save.image('~/Documents/R_onAir/GageAnalysis/src/gageS1_output.Rdata')
+```{r}
+save.image('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/gageS1_output.Rdata ')
 ```
 
 

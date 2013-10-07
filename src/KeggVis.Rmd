@@ -13,24 +13,25 @@ TODO: push graph output to html
 #### Kegg
 
 ```{r}
-
-load('./gage_output.Rdata')
+ # source("http://bioconductor.org/biocLite.R")
+ #   biocLite("pathview")
+load('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/gageS1_output.Rdata ')
 # location to export graphs
 setwd('~/Documents/R_onAir/GageAnalysis/graphs/')
-library(pathview)
-# get differences compared to control
-data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
-mean.data.output =rowMeans(data.output)
+
+
 
 # enter as many as I want to graph
+# input is from gage_step1.Rmd
 ans.path.ids = c(analysis.esg.up$essentialSets[[1]],analysis.esg.up$essentialSets[[2]])
 path.ids=ans.path.ids
 path.ids2 <- substr(path.ids, 1, 8)
 #native KEGG view
-
-
-ans.kegg.native = T # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
-# take mean of differences
-pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft"))
+ans.kegg.native = F # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+require(pathview)
+# get differences compared to control
+data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
+mean.data.output =rowMeans(data.output)
+pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, gene.idtype = 'symbol',pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft")) #*note gene.idtype
 
 

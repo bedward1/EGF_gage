@@ -13,7 +13,6 @@ load(file='diagnostics/Preproc.Rdata')
 # check correlation between pairs of replicates using scatter plot
 pairs(ws, cex.labels=.5, pch=20)
 # check correlation using cor
-cor(ws)
 require(gplots)
 heatmap.2(cor(ws),trace='none')
 ```
@@ -26,4 +25,18 @@ colnames(ws)
 colnames(ws)[1]='low.ctrl.none.1'
 colnames(ws)
 ```
+### Perform some tests between conditions   
+```{r}
+mean.low.ctrl.none = rowMeans(ws[,grep('low.ctrl.none',colnames(ws))])
+mean.low.egf.none = rowMeans(ws[,grep('low.egf.none',colnames(ws))])
+mean.low.egf.inh = rowMeans(ws[,grep('low.egf.inh',colnames(ws))])
 
+#mean.low.ctrl.inh = rowMeans(ws[,grep('low.ctrl.inh',colnames(ws))])--control was not done
+#plot(ws[,1],ws[,7])
+plot(mean.low.ctrl.none,mean.low.egf.none, main='EGF effect on low density')
+```
+
+### Output   
+use ws files still
+```{r} 
+  save.image('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/init_analysis_output.Rdata')
