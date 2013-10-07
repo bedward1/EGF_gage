@@ -1,0 +1,36 @@
+Visualization of pathways with regulated nodes
+========================================================
+Started: October 4, 2013     
+By Bryan Linggi     
+
+input: R.data file that has gage analysis results    
+output: .png file with graphs in local folder *need to specify  
+Date run: `r date() `
+
+TODO: push graph output to html
+
+### Pathway Visualization
+#### Kegg
+
+```{r}
+
+load('./gage_output.Rdata')
+# location to export graphs
+setwd('~/Documents/R_onAir/GageAnalysis/graphs/')
+library(pathview)
+# get differences compared to control
+data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
+mean.data.output =rowMeans(data.output)
+
+# enter as many as I want to graph
+ans.path.ids = c(analysis.esg.up$essentialSets[[1]],analysis.esg.up$essentialSets[[2]])
+path.ids=ans.path.ids
+path.ids2 <- substr(path.ids, 1, 8)
+#native KEGG view
+
+
+ans.kegg.native = T # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+# take mean of differences
+pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft"))
+
+

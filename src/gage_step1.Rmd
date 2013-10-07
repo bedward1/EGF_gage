@@ -7,20 +7,26 @@ Output: results of gage
 
 [link to Gage manuscript](http://www.biomedcentral.com/1471-2105/10/161) 
 
-`r require(gage) `
 
 ### Get pathway library   
 if is new pathway library, make in separate script and test
 ```{r}
+require(gage)
 setwd('~/Documents/R_onAir/GageAnalysis/reports/')
+data(go.gs)
 data(kegg.gs)
+data(egSymb)
 # make library generic for next steps
-path.lib = kegg.gs
+path.lib =  kegg.gs #kegg.gs
+# convert entrez to sym
+
+path.lib = lapply(path.lib,eg2sym)
 ```
 
-### Import data
+### Import data from preproccessing folder
 ```{r} 
 load('~/Documents/R_onAir/GageAnalysis/munge/Preprocessed.Rdata')
+
 # make data generic for next steps
 # WARNING: row names and data must be correct for the next line
 data.G1 = as.matrix(ws[,2:13]) 
@@ -38,12 +44,11 @@ check.treatment = print(colnames(data.G1[test.idx]))
 ```{r}
 #options: called answers
 ans.same.dir = F
-ans.use.fold = T # or F is t-statistic
-ans.rank.test = T
+ans.use.fold = F # or F is t-statistic
+ans.rank.test = F
 ans.ref = control.idx
 ans.samp = test.idx
 ans.saaTest = gs.KSTest # non-parametric
-ans.sam = 'unpaired' # or 'paried'
 ans.use.stouffer= T # p-value normalization method
 ans.compare = 'paired' # 'paired', 'unpaired', '1ongroup','as.group'
 
@@ -53,69 +58,13 @@ analysis.1 <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, sa
 #### text output to /report location. change name as necessary
 
 ```{r} 
-# output data results to file
-write.table(analysis.1$greater, file = '~/Documents/R_onAir/GageAnalysis/reports/test_sample_gage.xls', sep ="\t") `
+# output primary analysis data results to file, TODO, create labels
 
-#create heatmap, heatmap-sends to local /reports folder
- summary.regulated = sigGeneSet(analysis.1, heatmap=1, pdf.size=c(8,8), qpval= 'q.val',  cutoff=.01) #TODO change formatting of heatmap
-
-#heatmap of genes that change in each gene list 
-#pick how many to print
-print.top = 3
-
-genes.print=unique(unlist(path.lib[rownames(analysis.1$greater)[1:print.top]]))
-genes.print.data=essGene(genes.print, data.G1, ref =ans.ref, samp = ans.samp)
-for (gs in rownames(analysis.1$greater)[1:print.top]) {
-  outname = gs
-  # numbering of these colums is different from original. Refs are 1st half, samples are second half
-  geneData(genes = path.lib[[gs]], exprs = genes.print.data, ref = 1:(ncol(data.G1)/2),,
-         samp = (ncol(data.G1)/2+1) : ncol(data.G1), txt = T, heatmap = T,
-         Colv = F, Rowv = F, dendrogram = "none", outname=gs, limit = 3, scatterplot = F)
-}
+write.table(rbind(analysis.1$greater, analysis.1$less), file = '~/Documents/R_onAir/GageAnalysis/reports/test_sample_GO_gage.xls', sep ="\t") 
 ```
 
-#### visualize on kegg map
-```{r}
-require(pathview)
-library(pathview)
- gse16873.d <- gse16873[ ,samp.ans] - gse16873[ ,ref.ans]
- path.ids=c("hsa04110 Cell cycle", "hsa00020 Citrate cycle (TCA cycle)")
- path.ids2 <- substr(path.ids, 1, 8)
- #native KEGG view
- pv.out.list <- sapply(path.ids2, function(pid) pathview(gene.data = gse16873.d[,1:2], pathway.id = pid, species = "hsa"))
-> + +
-pv.out.list <- sapply(path.ids2, function(pid) pathview(gene.data = gse16873.d[, 1:2], pathway.id = pid, species = "hsa", kegg.native=F,
-                        sign.pos="bottomleft"))
-
-
-
-### identify gene sets (pathways) that overlap in their core genes   
-Core gene sets are those that contribute most to the identification of the gene set as signifiant   
-
-# need t use same input as as for 'gage' call
-analysis.esg.up <- esset.grp(analysis.1$greater,data.G1, gsets =kegg.gs, ref = ans.ref, samp = ans.samp,test4up = T, same.dir=ans.same.dir, output = T, outname = "test", make.plot = T, compare = ans.compare)
-names(kegg.gs)
-names(analysis.esg.up)
-analysis.esg.up$setGroups
+#save to allow load for next steps
+save.image('~/Documents/R_onAir/GageAnalysis/src/gageS1_output.Rdata')
 ```
 
-### Pathway Visualization
-#### Kegg
 
-```{r}
-setwd('~/Documents/R_onAir/GageAnalysis/graphs/')
-library(pathview)
-# get differences compared to control
-data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
-mean.data.output =rowMeans(data.output)
-
-# enter as many as I want to graph
-ans.path.ids = c(analysis.esg.up$essentialSets[[1]],analysis.esg.up$essentialSets[[2]])
-path.ids=ans.path.ids
-path.ids2 <- substr(path.ids, 1, 8)
-#native KEGG view
-
-
-ans.kegg.native = T # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
-# take mean of differences
-pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft"))
