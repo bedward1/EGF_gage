@@ -1,0 +1,29 @@
+Initial analysis, differential expression data
+========================================================
+Created: Oct 7, 2013, Bryan Linggi  
+ 
+input: prerocessed data . load R.data from diagnostics folder
+output: plots to identify general trends or problems in data    
+
+executed: `r date() `  
+
+```{r}
+setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis/')
+load(file='diagnostics/Preproc.Rdata')
+# check correlation between pairs of replicates using scatter plot
+pairs(ws, cex.labels=.5, pch=20)
+# check correlation using cor
+cor(ws)
+require(gplots)
+heatmap.2(cor(ws),trace='none')
+```
+* replicates have high correlation (could do cor function also)  
+  
+* need to relable the 'low.none.none' to 'low.ctrl.none'  
+
+```{r} 
+colnames(ws)
+colnames(ws)[1]='low.ctrl.none.1'
+colnames(ws)
+```
+

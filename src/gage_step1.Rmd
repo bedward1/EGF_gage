@@ -2,7 +2,7 @@ Gage pipeline, Step I- calcs
 ========================================================
 Started: Bryan Linggi October 2, 2013  
 Updated:  
-Input: Preprocessed data. 'Preproccessing.Rdata' from 'munge' fold  
+Input: Preprocessed data. 'Preproc.Rdata' from 'diagnostics'  
 Output: results of gage      
 
 [link to Gage manuscript](http://www.biomedcentral.com/1471-2105/10/161) 
@@ -11,8 +11,10 @@ Output: results of gage
 ### Get pathway library   
 if is new pathway library, make in separate script and test
 ```{r}
-require(gage)
-setwd('~/Documents/R_onAir/GageAnalysis/reports/')
+setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis/')
+
+require("gage")
+
 data(go.gs)
 data(kegg.gs)
 data(egSymb)
@@ -25,14 +27,14 @@ path.lib = lapply(path.lib,eg2sym)
 
 ### Import data from preproccessing folder
 ```{r} 
-load('~/Documents/R_onAir/GageAnalysis/munge/Preprocessed.Rdata')
+load('diagnostics/Preproc.Rdata')
 
 # make data generic for next steps
 # WARNING: row names and data must be correct for the next line
-data.G1 = as.matrix(ws[,2:13]) 
+data.G1 = as.matrix(ws[,]) 
 #identify control and test column for comparison
 
-control.idx = grep('HN',colnames(data.G1),ignore.case=T)
+control.idx = grep('',colnames(data.G1),ignore.case=T)
 test.idx = grep('DCIS',colnames(data.G1),ignore.case=T)
 #check
 check.control =print(colnames(data.G1[control.idx]))

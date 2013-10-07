@@ -9,108 +9,116 @@ text in **Bold** indicates things to note or follow up on
 ### Purpose
 1.Perform initial preprocessing steps to get rid of any errors in data gathering or collection.  
 2.Perform quality checks      
-     
+
+executed: `r date() `
   
 input, raw .xls file 'ws'    
 output, ws.preprocessed    
 Set path to data folder
+
 ```{r}
+setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis')
 require(XLConnect)
-#import data, in .xls form
-ws=readWorksheetFromFile('~/Documents/R_onAir/Anova_LDRD/LDRD_anova_projtemp/data/20130917_MDAMB231_HMEC_Anova_Data.xlsx',sheet=1,header=T)
+
+#import data, in .xls form.
+ws=readWorksheetFromFile('/Volumes/Documents-1/R_onAir/EGF_gage analysis/data/Seq02_density.xls',sheet=1,header=T, rownames=1)
 ```
 ### What is the response variable? 
 
 ```{r} 
 check.resopnse.var=print(summary(ws))
-  response.var.answer = 'Fold.Change' ### manual input#*
+  response.var.answer = 'Gene expression level, Z-scale normalized ' ### manual input#*
 ```
 ### Is it categorical or continuous?
 
 ```{r}
-  response.var.values = print((ws$Fold.Change)) ### 
+   ### 
    cat.or.cont.answer = print('continuous') ### manual input#*
 ```
 ### What is the range of values?
 
 ```{r} 
-response.var.range = print(range(ws$Fold.Change,na.rm=T))
+response.var.range = print(range(ws$low.none.none,na.rm=T))
 ```
 #### Are there any outliers?
 
 ```{r}
-   response.boxplot = boxplot(ws$Fold.Change)
+   response.boxplot = boxplot(ws)
 ```
-*answer: there is outlier at about 18000*  ### manual input
-*remove outlier, remame ws*
+*answer: some outliers in a couple of samples, but is not too dramatic. keep them there*   ### manual input  
+ 
 ```{r}
-ws.v2 = ws[- which(ws$Fold.Change==(max(ws$Fold.Change,na.rm=TRUE))),]
+# do not use    ws.v2 = ws[- which(ws$Fold.Change==(max(ws$Fold.Change,na.rm=TRUE))),]
 ```
 recheck for other outliers
 ```{r}
-response.boxplot.v2 = boxplot(ws.v2$Fold.Change)
+ #do no use response.boxplot.v2 = boxplot(ws.v2$Fold.Change)
 ```
-*looks ok now*
+
 #### Are there any missing values? Should they be removed?
 
 ```{r}
-summary.ws.v2 = print(summary(ws.v2))
+summary.ws.v2 = print(summary(ws))
 ```
-*18 NAN in EGF column*
-**checking on these with Becky, they are probably 0s. Confirmed Sept24, these are 0**
-*fix missing values for these*
-```{r}
-ws.v2$EGF[which(is.na(ws.v2$EGF))]=1
-```
-*confirm the NA are removed*
-```{r}
-summary.ws.v2 = print(summary(ws.v2))
-```
-*2 NAN in Fold. Change column*
-**these are real NAN, probably no detectable signal in PCR.  Could make large number, but also could be do to bad PCR. So leave as NAN now**
+*1 nan in each column
+`r which(is.na(ws[,12])) `
+*each is at row 15070. is last row*
+`r ws[15070,] `
+*remove this row*
+`r ws= ws[-15070,] `
+
+*also remove any rows that have 'na' names, there are 1282*
+`r ws= ws[-(grep('na.',rownames(ws), ignore.case=F)),]`
+*also remove rows with names with ####, there are 25 *
+`r ws= ws[-(grep('###',rownames(ws), ignore.case=F)),] `
+
+*the new dataset has `r (nrow(ws)) ` rows
+
 
 ### Determine data coding 
-```{r}
-data.coding.workbook=loadWorkbook('../diagnostics/levels.xls',create=TRUE)
-    createSheet(data.coding.workbook,name='coding_levels')
-    description=paste((date()),'diagnostics: LEVELS of column data')
-    writeWorksheet(description,object=data.coding.workbook, sheet='levels', startRow=1,header=F)
-    writeWorksheet(t(colnames(ws.v2)),object=data.coding.workbook, sheet='levels', startRow=3, startCol=2)
+*not necessary for this dataset, no factors to code*    
 
-for (i in  1:ncol(ws)){
-       #output all levels for factors
-          writeWorksheet(levels(as.factor(ws.v2[,i])), object= data.coding.workbook,sheet='levels',startCol=i+1,startRow=5,header=F)
-                            }
-         saveWorkbook(data.coding.workbook)
-```
-look at 'levels.xls' in /diagnostics to determine if coding is appropriate  
-* the variables are the doses of tgfb or egf, and 1 or 0 for the inhibitors Also have the primerset, cellline, and density. all of these can be treated as factors for now*
-            
-#### Recode variables
-*recode as factors all but the response variable (Fold.Change)*
-```{r}
-ws.v2.factored=ws.v2
-      # make vector to id all columns to factor except response variable
-      idx=1:ncol(ws.v2)
-      idx = idx[-21]  # idx of response var
+#```{r}
+ data.coding.workbook=loadWorkbook('../diagnostics/levels.xls',create=TRUE)
+     createSheet(data.coding.workbook,name='coding_levels')
+     description=paste((date()),'diagnostics: LEVELS of column data')
+     writeWorksheet(description,object=data.coding.workbook, sheet='levels', startRow=1,header=F)
+     writeWorksheet(t(colnames(ws.v2)),object=data.coding.workbook, sheet='levels', startRow=3, startCol=2)
+ 
+ for (i in  1:ncol(ws)){
+        #output all levels for factors
+           writeWorksheet(levels(as.factor(ws.v2[,i])), object= data.coding.workbook,sheet='levels',startCol=i+1,startRow=5,header=F)
+                             }
+          saveWorkbook(data.coding.workbook)
+ ```
+ look at 'levels.xls' in /diagnostics to determine if coding is appropriate  
+
+             
+# #### Recode variables    
+
+  ```{r}
+ ws.v2.factored=ws.v2
+       # make vector to id all columns to factor except response variable
+       idx=1:ncol(ws.v2)
+       idx = idx[-21]  # idx of response var
     for (i in idx)
-    {
+     {
       ws.v2.factored[,i] = as.factor(ws.v2[,i])
-    }
+     }
 ```
 #### Make new sheet in same .xls sheet and export summary
 
-```{r}
-createSheet(data.coding.workbook,name='levels_summary')
-      writeWorksheet(summary(ws.v2.factored),object=data.coding.workbook,sheet='levels_summary')
-      saveWorkbook(data.coding.workbook)
-      # and print to console
-      print(summary(ws.v2.factored))
+ ```{r}
+ createSheet(data.coding.workbook,name='levels_summary')
+       writeWorksheet(summary(ws.v2.factored),object=data.coding.workbook,sheet='levels_summary')
+       saveWorkbook(data.coding.workbook)
+       # and print to console
+       print(summary(ws.v2.factored))
 ```
-*do not see any '1' for p38*
+
 #### Output of this step of preprocessing
 
 ```{r}
-ws.prepocessed = ws.v2.factored
-save.image('~/Documents/R_onAir/Anova_LDRD/LDRD_anova_projtemp/reports/munge')
+ws.prepocessed = ws
+save.image('/Volumes/Documents-1/R_onAir/EGF_gage analysis/diagnostics/Preproc.Rdata')
 
