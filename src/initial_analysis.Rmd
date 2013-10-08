@@ -9,11 +9,12 @@ executed: `r date() `
 
 ```{r}
 setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis/')
+require(gplots)
 load(file='diagnostics/Preproc.Rdata')
 # check correlation between pairs of replicates using scatter plot
 pairs(ws, cex.labels=.5, pch=20)
 # check correlation using cor
-require(gplots)
+
 heatmap.2(cor(ws),trace='none')
 ```
 * replicates have high correlation (could do cor function also)  

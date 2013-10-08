@@ -48,6 +48,7 @@ check.treatment = print(colnames(data.G1)[test.idx])
 #### Gage analysis
 ```{r}
 #options: called answers
+require(gage)
 ans.same.dir = F
 ans.use.fold = F # or F is t-statistic
 ans.rank.test = F
@@ -57,21 +58,28 @@ ans.saaTest = gs.KSTest # non-parametric
 ans.use.stouffer= T # p-value normalization method
 ans.compare = 'unpaired' # 'paired', 'unpaired', '1ongroup','as.group'
 
-analysis.1 <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, same.dir=ans.same.dir, use.fold= ans.use.fold, rank.test= ans.rank.test, saaTest = ans.saaTest, compare= ans.compare, use.stouffer=ans.use.stouffer)
+# ****name output file names (describe to identify later )
+
+filename.desc = paste(check.control,check.treatment,ans.same.dir,ans.use.fold,ans.rank.test,ans.use.stouffer,ans.compare,sep="_")
+# this makes 2 characters. use only 1 TODO fix
+
+gage.run <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, same.dir=ans.same.dir, use.fold= ans.use.fold, rank.test= ans.rank.test, saaTest = ans.saaTest, compare= ans.compare, use.stouffer=ans.use.stouffer)
 
 # to select essential genes in group# these are used in KeggVis.Rmd for pathway viewing
-analysis.esg.greater <- esset.grp(analysis.1$greater, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold)
+essential.greater <- esset.grp(gage.run$greater, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold)
 
-analysis.esg.less <- esset.grp(analysis.1$less, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold)
+essential.less <- esset.grp(gage.run$less, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold)
 
 ```
-### output
-#### text output to /report location. change name as necessary
-
-```{r} 
-# output primary analysis data results to file, TODO, create labels
-
-write.table(rbind(analysis.1$greater), file = '/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/out.xls', sep ="\t") 
+### output  
+1)"gage.run" has the tables 'greater' and 'less', and 'stats' that show the diff pathways    
+2) essential.greater and essential.less have the pathways that are regulated higher (greater) or lower (less) than controls #TODO figure this out    
+  a) use these as inputs to Kegg.Vis if kegg is use for pathway analysis. TODO, map to other pathways types?   
+  b) each of these has lists that are the core and essential gene groups (see Vignette)      
+3) output this as a table
+```{r}
+#change location as necess
+write.table(rbind(analysis.1$greater), file = paste('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/',filename.desc[1],'.xls',collapse=T), sep ="\t") 
 ```
 
 #save to allow load for next steps
