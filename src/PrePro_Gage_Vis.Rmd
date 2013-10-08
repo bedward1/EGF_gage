@@ -1,0 +1,337 @@
+Processing Expression Data for pathway enrichment
+==================
+
+### I. Data munge
+
+Started: Linggi Sept 23,2013   
+
+notes:    
+text in *italic* indicates response to test   
+text in **Bold** indicates things to note or follow up on  
+#*********** indicates area to change inputs
+
+## Purpose
+1.Perform initial preprocessing steps to get rid of any errors in data gathering or collection.  
+2.Perform quality checks      
+
+executed: `r date() `
+  
+input, raw .xls file 'ws'    
+output, ws.preprocessed    
+Set path to data folder
+
+```{r}
+      #************
+pick.directory = '/Volumes/Documents/R_onAir/EGF_gage analysis/'
+      #************
+setwd(pick.directory)
+require(XLConnect)
+
+#import data, in .xls form.
+      #************
+ws=readWorksheetFromFile('/Volumes/Documents/R_onAir/EGF_gage analysis/data/Seq02_density.xls',sheet=1,header=T, rownames=1)
+      #************ 
+```
+### What is the response variable? 
+
+```{r} 
+check.resopnse.var=print(summary(ws))
+  #************
+  response.var.answer = 'Gene expression level, Z-scale normalized ' ### manual input#*
+```
+### Is it categorical or continuous?
+
+```{r}
+   ### 
+#************
+   cat.or.cont.answer = print('continuous') ### manual input#*
+```
+### What is the range of values?
+
+```{r} 
+response.var.range = print(range(ws$low.none.none,na.rm=T))
+```
+#### Are there any outliers?
+
+```{r}
+   response.boxplot = boxplot(ws)
+```
+*answer: some outliers in a couple of samples, but is not too dramatic. keep them there*   ### manual input  
+ 
+```{r}
+# do not use    ws.v2 = ws[- which(ws$Fold.Change==(max(ws$Fold.Change,na.rm=TRUE))),]
+```
+recheck for other outliers
+```{r}
+ #do no use response.boxplot.v2 = boxplot(ws.v2$Fold.Change)
+```
+
+#### Are there any missing values? Should they be removed?
+
+```{r}
+summary.ws.v2 = print(summary(ws))
+#1 nan in each column
+#************
+which(is.na(ws[,12])) 
+#*each is at row 15070. is last row*
+ws[15070,]
+#************
+#*remove this row*
+ws= ws[-15070,]
+
+#*also remove any rows that have 'na' names, there are 1282*
+ws= ws[-(grep('na.',rownames(ws), ignore.case=F)),]
+#*also remove rows with names with ####, there are 25 *
+ws= ws[-(grep('###',rownames(ws), ignore.case=F)),]
+
+#*the new dataset has
+nrow(ws)
+# rows
+
+### Determine data coding 
+#*not necessary for this dataset, no factors to code*    
+
+#```{r}
+#  data.coding.workbook=loadWorkbook('../diagnostics/levels.xls',create=TRUE)
+#      createSheet(data.coding.workbook,name='coding_levels')
+#      description=paste((date()),'diagnostics: LEVELS of column data')
+#      writeWorksheet(description,object=data.coding.workbook, sheet='levels', startRow=1,header=F)
+#      writeWorksheet(t(colnames(ws.v2)),object=data.coding.workbook, sheet='levels', startRow=3, startCol=2)
+#  
+#  for (i in  1:ncol(ws)){
+#         #output all levels for factors
+#            writeWorksheet(levels(as.factor(ws.v2[,i])), object= data.coding.workbook,sheet='levels',startCol=i+1,startRow=5,header=F)
+#                              }
+#           saveWorkbook(data.coding.workbook)
+#  ```
+#  look at 'levels.xls' in /diagnostics to determine if coding is appropriate  
+# 
+#              
+# # #### Recode variables    
+# 
+#   ```{r}
+#  #ws.v2.factored=ws.v2
+#        # make vector to id all columns to factor except response variable
+#        idx=1:ncol(ws.v2)
+#        idx = idx[-21]  # idx of response var
+#     for (i in idx)
+#      {
+#       ws.v2.factored[,i] = as.factor(ws.v2[,i])
+#      }
+# ```
+# #### Make new sheet in same .xls sheet and export summary
+# 
+#  ```{r}
+# createSheet(data.coding.workbook,name='levels_summary')
+#        writeWorksheet(summary(ws.v2.factored),object=data.coding.workbook,sheet='levels_summary')
+#        saveWorkbook(data.coding.workbook)
+#        # and print to console
+#        print(summary(ws.v2.factored))
+# ```
+# 
+# #### Output of this step of preprocessing
+
+#```{r}
+#save.image('/Volumes/Documents-1/R_onAir/EGF_gage analysis/diagnostics/Preproc.Rdata')
+```
+
+### II. Initial analysis, differential expression data
+
+Created: Oct 7, 2013, Bryan Linggi  
+ 
+input: prerocessed data . load R.data from diagnostics folder
+output: plots to identify general trends or problems in data    
+
+
+```{r}
+require(gplots)
+
+# check correlation between pairs of replicates using scatter plot
+# pairs(ws, cex.labels=.5, pch=20)--COMMENT OUT TO SAVE TIME IN TESTING
+# check correlation using cor
+
+heatmap.2(cor(ws),trace='none')
+```
+* replicates have high correlation (could do cor function also)  
+  
+* need to relable the 'low.none.none' to 'low.ctrl.none'  
+
+```{r} 
+colnames(ws)
+#************
+colnames(ws)[1]='low.ctrl.none.1'
+colnames(ws)
+```
+### Perform some tests between conditions   
+```{r}
+#************
+mean.low.ctrl.none = rowMeans(ws[,grep('low.ctrl.none',colnames(ws))])
+mean.low.egf.none = rowMeans(ws[,grep('low.egf.none',colnames(ws))])
+mean.low.egf.inh = rowMeans(ws[,grep('low.egf.inh',colnames(ws))])
+#************
+
+#mean.low.ctrl.inh = rowMeans(ws[,grep('low.ctrl.inh',colnames(ws))])--control was not done
+#plot(ws[,1],ws[,7])
+#************
+plot(mean.low.ctrl.none,mean.low.egf.none, main='EGF effect on low density')
+```
+
+#### Output   
+*use ws files still*
+
+### III. Gage pipeline, Step I- calcs
+
+Started: Bryan Linggi October 2, 2013  
+Updated:  
+Input: Preprocessed data. 'Preproc.Rdata' from 'diagnostics'  
+Output: results of gage      
+
+[link to Gage manuscript](http://www.biomedcentral.com/1471-2105/10/161) 
+
+
+### Get pathway library   
+if is new pathway library, make in separate script and test
+```{r}
+require("gage")
+#data(go.gs)
+#************
+data(kegg.gs)
+data(egSymb)
+# make library generic for next steps
+#************
+path.lib =  kegg.gs #** kegg.gs
+# convert entrez to sym * note that will not work if not using appropriate conversion (see in pathview function also)
+#************
+path.lib = lapply(path.lib,eg2sym)
+```
+
+```{r} 
+# WARNING: row names and data must be correct for the next line
+
+#for this data only, need to get rid of bracketint " ' "
+#************
+row.names(ws)= sub('\'','',sub('\'','',row.names(ws)))
+data.G1 = as.matrix(ws) 
+
+#identify control and test column for comparison
+           #**************
+control.idx = grep('high.ctrl.none',colnames(data.G1),ignore.case=T) #***
+test.idx = grep('high.egf.none',colnames(data.G1),ignore.case=T)#***
+           #**************
+#check
+check.control =print(colnames(data.G1)[control.idx])
+check.treatment = print(colnames(data.G1)[test.idx])
+```
+** gernalized from here on **
+
+#### Gage analysis
+```{r}
+          #***********
+#options: called answers
+ans.same.dir = F
+ans.use.fold = F # or F is t-statistic
+ans.rank.test = F
+ans.ref = control.idx
+ans.samp = test.idx
+ans.saaTest = gs.KSTest # non-parametric
+ans.use.stouffer= T # p-value normalization method
+ans.compare = 'as.group' # 'paired', 'unpaired', '1ongroup','as.group'
+          #**********
+# create variable to capture options
+filename.desc = paste(check.control,check.treatment,ans.same.dir,ans.use.fold,ans.rank.test,ans.use.stouffer,ans.compare,sep="_")
+# this makes 2 characters. use only 1 TODO fix
+
+gage.run <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, same.dir=ans.same.dir, use.fold= ans.use.fold, rank.test= ans.rank.test, saaTest = ans.saaTest, compare= ans.compare, use.stouffer=ans.use.stouffer)
+
+# to select essential genes in group# these are used in KeggVis.Rmd for pathway viewing
+essential.greater <- esset.grp(gage.run$greater, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold)
+
+essential.less <- esset.grp(gage.run$less, data.G1, gsets=path.lib, ref = ans.ref, samp = ans.samp, output = F,make.plot = F, compare= ans.compare, test4up= T, samedir=ans.same.dir, use.fold=ans.use.fold) ##TODO figure out why is NULL
+
+```
+### output  
+1)"gage.run" has the tables 'greater' and 'less', and 'stats' that show the diff pathways    
+2) essential.greater and essential.less have the pathways that are regulated higher (greater) or lower (less) than controls #TODO figure this out    
+  a) use these as inputs to Kegg.Vis if kegg is use for pathway analysis. TODO, map to other pathways types?   
+  b) each of these has lists that are the core and essential gene groups (see Vignette)      
+3) output this as a table
+```{r}
+# write output to local graphs directory
+write.table(rbind(head(gage.run$greater), head(gage.run$less)), file = paste('./graphs/',filename.desc[1],'.xls',sep=''), sep ="\t") 
+```
+
+### IV. Gage step 2
+
+started October 4 ,2013
+Bryan Linggi  
+Purpose: To filter differential pathway expression results    
+
+input: R.data from Gage Step1, which contains the results of the analysis, analysis.1, gene set definitions (kegg)
+output: filtered output , heatmaps?  
+
+#### Heatmap
+```{r}
+#### process analysis to remove redundant genes from gene sets
+
+# convert entrez to symbol
+
+#create heatmap, heatmap-sends to local /reports folder
+ summary.regulated = sigGeneSet(gage.run, heatmap=1, pdf.size=c(8,8), qpval= 'q.val',  cutoff=.01) #TODO change formatting of heatmap, TODO matrix error here
+
+#heatmap of genes that change in each gene list 
+#pick how many to print
+           #*******
+print.top = 3
+          #*******
+genes.print=unique(unlist(path.lib[rownames(gage.run$greater)[1:print.top]]))
+genes.print.data = essGene(genes.print, data.G1, ref =ans.ref, samp = ans.samp)
+for (gs in rownames(gage.run$greater)[1:print.top]) {
+  outname = gs
+  # numbering of these colums is different from original. Refs are 1st half, samples are second half******check this for each expt
+  geneData(genes = path.lib[[gs]], exprs = genes.print.data, ref = ans.ref,
+         samp = ans.samp, txt = T, heatmap = T,Colv = F, Rowv = F, dendrogram = "none", outname=gs, limit = 3, scatterplot = F)  
+}  #TODO error here
+```
+### V. Visualization of pathways with regulated nodes
+Started: October 4, 2013     
+By Bryan Linggi     
+
+input: R.data file that has gage analysis results    
+output: .png file with graphs in local folder *need to specify  
+
+TODO: push graph output to html
+
+### Pathway Visualization
+#### Kegg
+
+```{r}
+ source("http://bioconductor.org/biocLite.R")
+ biocLite("pathview")
+
+# location to export graphs
+setwd('./graphs/')
+
+
+
+
+# input is 'essential.greater' from gage_step1.Rmd
+
+# ** make local folder to save these graphs
+           #***********
+dir.create('./high')
+           #***********
+setwd('./high')
+# enter as many as I want to graph
+           #***********
+ans.path.ids = c(essential.greater$essentialSets[[3]])
+           #***********
+path.ids=ans.path.ids
+path.ids2 <- substr(path.ids, 1, 8)
+#native KEGG view
+ans.kegg.native = F # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+require(pathview)
+# get differences compared to control
+data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
+mean.data.output =rowMeans(data.output)
+pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, gene.idtype = 'symbol',pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft")) #*note gene.idtype
+```

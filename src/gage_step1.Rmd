@@ -36,7 +36,7 @@ load('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/init_analysis_output.
  row.names(ws)= sub('\'','',sub('\'','',row.names(ws)))
 data.G1 = as.matrix(ws) 
 
-#identify control and test column for comparison
+#identify control and test column for comparison**
 control.idx = grep('high.ctrl.none',colnames(data.G1),ignore.case=T)
 test.idx = grep('high.egf.none',colnames(data.G1),ignore.case=T)
 #check

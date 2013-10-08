@@ -38,5 +38,4 @@ require(pathview)
 data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
 mean.data.output =rowMeans(data.output)
 pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, gene.idtype = 'symbol',pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft")) #*note gene.idtype
-
-
+```
