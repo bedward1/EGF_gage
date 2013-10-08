@@ -1,7 +1,7 @@
 Processing Expression Data for pathway enrichment
 ==================
 
-### I. Data munge
+##I. Data munge
 
 Started: Linggi Sept 23,2013   
 
@@ -10,11 +10,11 @@ text in *italic* indicates response to test
 text in **Bold** indicates things to note or follow up on  
 #*********** indicates area to change inputs
 
-## Purpose
+### Purpose
 1.Perform initial preprocessing steps to get rid of any errors in data gathering or collection.  
 2.Perform quality checks      
 
-executed: Tue Oct  8 15:48:21 2013
+executed: Tue Oct  8 16:04:03 2013
   
 input, raw .xls file 'ws'    
 output, ws.preprocessed    
@@ -96,7 +96,7 @@ cat.or.cont.answer = print("continuous")  ### manual input#*
 ## [1] "continuous"
 ```
 
-### What is the range of values?
+#### What is the range of values?
 
 
 ```r
@@ -131,7 +131,7 @@ recheck for other outliers
 ```
 
 
-#### Are there any missing values? Should they be removed?
+###Are there any missing values? Should they be removed?
 
 
 ```r
@@ -553,7 +553,7 @@ biocLite("pathview")
 ```
 ## 
 ## The downloaded binary packages are in
-## 	/var/folders/bx/_w1zt2lx4vs9cywrhjjlk6xdgnbh7z/T//RtmpolQRTN/downloaded_packages
+## 	/var/folders/bx/_w1zt2lx4vs9cywrhjjlk6xdgnbh7z/T//RtmpaaD7by/downloaded_packages
 ```
 
 ```r
@@ -574,16 +574,23 @@ setwd("./graphs/")
 # input is 'essential.greater' from gage_step1.Rmd
 
 # ** make local folder to save these graphs ***********
-dir.create("./high")
+
 # ***********
-setwd("./high")
+setwd("../high/")
+```
+
+```
+## Error: cannot change working directory
+```
+
+```r
 # enter as many as I want to graph ***********
-ans.path.ids = c(essential.greater$essentialSets[[3]])
+ans.path.ids = c(essential.greater$essentialSets[[1]], essential.greater$essentialSets[[2]])
 # ***********
 path.ids = ans.path.ids
 path.ids2 <- substr(path.ids, 1, 8)
-# native KEGG view
-ans.kegg.native = F  # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+# native KEGG view *******************
+ans.kegg.native = T  # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
 require(pathview)
 ```
 
@@ -666,18 +673,38 @@ require(pathview)
 # get differences compared to control
 data.output <- data.G1[, ans.samp] - data.G1[, ans.ref]
 mean.data.output = rowMeans(data.output)
-pv.out.list <- sapply(path.ids2, function(pid) pathview(gene.data = mean.data.output, 
+pv.out.list <- print(sapply(path.ids2, function(pid) pathview(gene.data = mean.data.output, 
     gene.idtype = "symbol", pathway.id = pid, species = "hsa", kegg.native = ans.kegg.native, 
-    sign.pos = "bottomleft"))  #*note gene.idtype
+    sign.pos = "bottomleft")))  #*note gene.idtype
 ```
 
 ```
-## [1] "Downloading xml files for hsa04110, 1/1 pathways.."
-## [1] "Downloading png files for hsa04110, 1/1 pathways.."
+## [1] "Downloading xml files for hsa03030, 1/1 pathways.."
+## [1] "Downloading png files for hsa03030, 1/1 pathways.."
 ```
 
 ```
-## Working in directory /Volumes/Documents/R_onAir/EGF_gage analysis/src/high
-## Writing image file hsa04110.pathview.pdf
+## [1] "Downloading xml files for hsa03010, 1/1 pathways.."
+## [1] "Downloading png files for hsa03010, 1/1 pathways.."
+```
+
+```
+##                hsa03030 hsa03010
+## plot.data.gene List,9   List,9  
+## plot.data.cpd  NULL     NULL
+```
+
+```r
+setwd("../high")
+```
+
+```
+## Error: cannot change working directory
+```
+
+```r
+for (i in path.ids2) {
+    openPDF(paste(i, ".pathview.png", sep = ""))
+}
 ```
 

@@ -1,7 +1,7 @@
 Processing Expression Data for pathway enrichment
 ==================
 
-### I. Data munge
+##I. Data munge
 
 Started: Linggi Sept 23,2013   
 
@@ -10,7 +10,7 @@ text in *italic* indicates response to test
 text in **Bold** indicates things to note or follow up on  
 #*********** indicates area to change inputs
 
-## Purpose
+### Purpose
 1.Perform initial preprocessing steps to get rid of any errors in data gathering or collection.  
 2.Perform quality checks      
 
@@ -46,7 +46,7 @@ check.resopnse.var=print(summary(ws))
 #************
    cat.or.cont.answer = print('continuous') ### manual input#*
 ```
-### What is the range of values?
+#### What is the range of values?
 
 ```{r} 
 response.var.range = print(range(ws$low.none.none,na.rm=T))
@@ -66,7 +66,7 @@ recheck for other outliers
  #do no use response.boxplot.v2 = boxplot(ws.v2$Fold.Change)
 ```
 
-#### Are there any missing values? Should they be removed?
+###Are there any missing values? Should they be removed?
 
 ```{r}
 summary.ws.v2 = print(summary(ws))
@@ -305,8 +305,8 @@ TODO: push graph output to html
 #### Kegg
 
 ```{r}
- source("http://bioconductor.org/biocLite.R")
- biocLite("pathview")
+ #source("http://bioconductor.org/biocLite.R")
+# biocLite("pathview")
 
 # location to export graphs
 setwd('./graphs/')
@@ -318,20 +318,25 @@ setwd('./graphs/')
 
 # ** make local folder to save these graphs
            #***********
-dir.create('./high')
+
            #***********
-setwd('./high')
+setwd('../high/')
 # enter as many as I want to graph
            #***********
-ans.path.ids = c(essential.greater$essentialSets[[3]])
+ans.path.ids = c(essential.greater$essentialSets[[1]],essential.greater$essentialSets[[2]])
            #***********
 path.ids=ans.path.ids
 path.ids2 <- substr(path.ids, 1, 8)
 #native KEGG view
-ans.kegg.native = F # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+#*******************
+ans.kegg.native = T # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
 require(pathview)
 # get differences compared to control
 data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]
 mean.data.output =rowMeans(data.output)
-pv.out.list <- sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, gene.idtype = 'symbol',pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft")) #*note gene.idtype
+pv.out.list <- (sapply(path.ids2,  function(pid) pathview(gene.data = mean.data.output, gene.idtype = 'symbol',pathway.id = pid, species = "hsa", kegg.native=ans.kegg.native, sign.pos="bottomleft"))) #*note gene.idtype
+setwd('../high')
+
+
+knit('hsa03010.pathview.png')
 ```

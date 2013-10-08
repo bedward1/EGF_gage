@@ -180,7 +180,7 @@ hljs.initHighlightingOnLoad();
 <body>
 <h1>Processing Expression Data for pathway enrichment</h1>
 
-<h3>I. Data munge</h3>
+<p>##I. Data munge</p>
 
 <p>Started: Linggi Sept 23,2013   </p>
 
@@ -189,12 +189,12 @@ text in <em>italic</em> indicates response to test<br/>
 text in <strong>Bold</strong> indicates things to note or follow up on<br/>
 #*********** indicates area to change inputs</p>
 
-<h2>Purpose</h2>
+<h3>Purpose</h3>
 
 <p>1.Perform initial preprocessing steps to get rid of any errors in data gathering or collection.<br/>
 2.Perform quality checks      </p>
 
-<p>executed: Tue Oct  8 15:48:21 2013</p>
+<p>executed: Tue Oct  8 16:04:03 2013</p>
 
 <p>input, raw .xls file &#39;ws&#39;<br/>
 output, ws.preprocessed<br/>
@@ -265,7 +265,7 @@ cat.or.cont.answer = print(&quot;continuous&quot;)  ### manual input#*
 <pre><code>## [1] &quot;continuous&quot;
 </code></pre>
 
-<h3>What is the range of values?</h3>
+<h4>What is the range of values?</h4>
 
 <pre><code class="r">response.var.range = print(range(ws$low.none.none, na.rm = T))
 </code></pre>
@@ -291,7 +291,7 @@ cat.or.cont.answer = print(&quot;continuous&quot;)  ### manual input#*
 <pre><code class="r"># do no use response.boxplot.v2 = boxplot(ws.v2$Fold.Change)
 </code></pre>
 
-<h4>Are there any missing values? Should they be removed?</h4>
+<p>###Are there any missing values? Should they be removed?</p>
 
 <pre><code class="r">summary.ws.v2 = print(summary(ws))
 </code></pre>
@@ -669,7 +669,7 @@ output: .png file with graphs in local folder *need to specify  </p>
 
 <pre><code>## 
 ## The downloaded binary packages are in
-##  /var/folders/bx/_w1zt2lx4vs9cywrhjjlk6xdgnbh7z/T//RtmpolQRTN/downloaded_packages
+##  /var/folders/bx/_w1zt2lx4vs9cywrhjjlk6xdgnbh7z/T//RtmpaaD7by/downloaded_packages
 </code></pre>
 
 <pre><code class="r">
@@ -687,16 +687,21 @@ setwd(&quot;./graphs/&quot;)
 # input is &#39;essential.greater&#39; from gage_step1.Rmd
 
 # ** make local folder to save these graphs ***********
-dir.create(&quot;./high&quot;)
+
 # ***********
-setwd(&quot;./high&quot;)
-# enter as many as I want to graph ***********
-ans.path.ids = c(essential.greater$essentialSets[[3]])
+setwd(&quot;../high/&quot;)
+</code></pre>
+
+<pre><code>## Error: cannot change working directory
+</code></pre>
+
+<pre><code class="r"># enter as many as I want to graph ***********
+ans.path.ids = c(essential.greater$essentialSets[[1]], essential.greater$essentialSets[[2]])
 # ***********
 path.ids = ans.path.ids
 path.ids2 &lt;- substr(path.ids, 1, 8)
-# native KEGG view
-ans.kegg.native = F  # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+# native KEGG view *******************
+ans.kegg.native = T  # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
 require(pathview)
 </code></pre>
 
@@ -777,17 +782,33 @@ require(pathview)
 <pre><code class="r"># get differences compared to control
 data.output &lt;- data.G1[, ans.samp] - data.G1[, ans.ref]
 mean.data.output = rowMeans(data.output)
-pv.out.list &lt;- sapply(path.ids2, function(pid) pathview(gene.data = mean.data.output, 
+pv.out.list &lt;- print(sapply(path.ids2, function(pid) pathview(gene.data = mean.data.output, 
     gene.idtype = &quot;symbol&quot;, pathway.id = pid, species = &quot;hsa&quot;, kegg.native = ans.kegg.native, 
-    sign.pos = &quot;bottomleft&quot;))  #*note gene.idtype
+    sign.pos = &quot;bottomleft&quot;)))  #*note gene.idtype
 </code></pre>
 
-<pre><code>## [1] &quot;Downloading xml files for hsa04110, 1/1 pathways..&quot;
-## [1] &quot;Downloading png files for hsa04110, 1/1 pathways..&quot;
+<pre><code>## [1] &quot;Downloading xml files for hsa03030, 1/1 pathways..&quot;
+## [1] &quot;Downloading png files for hsa03030, 1/1 pathways..&quot;
 </code></pre>
 
-<pre><code>## Working in directory /Volumes/Documents/R_onAir/EGF_gage analysis/src/high
-## Writing image file hsa04110.pathview.pdf
+<pre><code>## [1] &quot;Downloading xml files for hsa03010, 1/1 pathways..&quot;
+## [1] &quot;Downloading png files for hsa03010, 1/1 pathways..&quot;
+</code></pre>
+
+<pre><code>##                hsa03030 hsa03010
+## plot.data.gene List,9   List,9  
+## plot.data.cpd  NULL     NULL
+</code></pre>
+
+<pre><code class="r">setwd(&quot;../high&quot;)
+</code></pre>
+
+<pre><code>## Error: cannot change working directory
+</code></pre>
+
+<pre><code class="r">for (i in path.ids2) {
+    openPDF(paste(i, &quot;.pathview.png&quot;, sep = &quot;&quot;))
+}
 </code></pre>
 
 </body>
