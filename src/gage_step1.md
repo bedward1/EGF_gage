@@ -38,23 +38,65 @@ path.lib = lapply(path.lib, eg2sym)
 
 ```r
 load("/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/init_analysis_output.Rdata")
+```
+
+```
+## Warning: cannot open compressed file
+## '/Volumes/Documents-1/R_onAir/EGF_gage
+## analysis/tests/init_analysis_output.Rdata', probable reason 'No such file
+## or directory'
+```
+
+```
+## Error: cannot open the connection
+```
+
+```r
 
 # make data generic for next steps WARNING: row names and data must be
 # correct for the next line
 
 # for this data, need to get rid of bracketint ' ' '
 row.names(ws) = sub("'", "", sub("'", "", row.names(ws)))
+```
+
+```
+## Error: object 'ws' not found
+```
+
+```r
 data.G1 = as.matrix(ws)
+```
+
+```
+## Error: object 'ws' not found
+```
+
+```r
 
 # identify control and test column for comparison
-control.idx = grep("low.ctrl.none", colnames(data.G1), ignore.case = T)
-test.idx = grep("low.egf.none", colnames(data.G1), ignore.case = T)
+control.idx = grep("high.ctrl.none", colnames(data.G1), ignore.case = T)
+```
+
+```
+## Error: object 'data.G1' not found
+```
+
+```r
+test.idx = grep("high.egf.none", colnames(data.G1), ignore.case = T)
+```
+
+```
+## Error: object 'data.G1' not found
+```
+
+```r
 # check
 check.control = print(colnames(data.G1)[control.idx])
 ```
 
 ```
-## [1] "low.ctrl.none.1" "low.ctrl.none"
+## Error: object 'data.G1' not found
 ```
 
 ```r
@@ -62,7 +104,7 @@ check.treatment = print(colnames(data.G1)[test.idx])
 ```
 
 ```
-## [1] "low.egf.none"   "low.egf.none.1"
+## Error: object 'data.G1' not found
 ```
 
 ** gernalized from here on **
@@ -71,29 +113,91 @@ check.treatment = print(colnames(data.G1)[test.idx])
 
 ```r
 # options: called answers
-ans.same.dir = T
-ans.use.fold = T  # or F is t-statistic
+require(gage)
+ans.same.dir = F
+ans.use.fold = F  # or F is t-statistic
 ans.rank.test = F
 ans.ref = control.idx
+```
+
+```
+## Error: object 'control.idx' not found
+```
+
+```r
 ans.samp = test.idx
+```
+
+```
+## Error: object 'test.idx' not found
+```
+
+```r
 ans.saaTest = gs.KSTest  # non-parametric
 ans.use.stouffer = T  # p-value normalization method
 ans.compare = "unpaired"  # 'paired', 'unpaired', '1ongroup','as.group'
 
-analysis.1 <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, 
+# ****name output file names (describe to identify later )
+
+filename.desc = paste(check.control, check.treatment, ans.same.dir, ans.use.fold, 
+    ans.rank.test, ans.use.stouffer, ans.compare, sep = "_")
+```
+
+```
+## Error: object 'check.control' not found
+```
+
+```r
+# this makes 2 characters. use only 1 TODO fix
+
+gage.run <- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, 
     same.dir = ans.same.dir, use.fold = ans.use.fold, rank.test = ans.rank.test, 
     saaTest = ans.saaTest, compare = ans.compare, use.stouffer = ans.use.stouffer)
 ```
 
-### output
-#### text output to /report location. change name as necessary
-
+```
+## Error: object 'data.G1' not found
+```
 
 ```r
-# output primary analysis data results to file, TODO, create labels
 
-write.table(rbind(analysis.1$greater, analysis.1$less), file = "/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/samedir_fold_unpaird_egf.xls", 
-    sep = "\t")
+# to select essential genes in group# these are used in KeggVis.Rmd for
+# pathway viewing
+essential.greater <- esset.grp(gage.run$greater, data.G1, gsets = path.lib, 
+    ref = ans.ref, samp = ans.samp, output = F, make.plot = F, compare = ans.compare, 
+    test4up = T, samedir = ans.same.dir, use.fold = ans.use.fold)
+```
+
+```
+## Error: object 'data.G1' not found
+```
+
+```r
+
+essential.less <- esset.grp(gage.run$less, data.G1, gsets = path.lib, ref = ans.ref, 
+    samp = ans.samp, output = F, make.plot = F, compare = ans.compare, test4up = T, 
+    samedir = ans.same.dir, use.fold = ans.use.fold)
+```
+
+```
+## Error: object 'data.G1' not found
+```
+
+### output  
+1)"gage.run" has the tables 'greater' and 'less', and 'stats' that show the diff pathways    
+2) essential.greater and essential.less have the pathways that are regulated higher (greater) or lower (less) than controls #TODO figure this out    
+  a) use these as inputs to Kegg.Vis if kegg is use for pathway analysis. TODO, map to other pathways types?   
+  b) each of these has lists that are the core and essential gene groups (see Vignette)      
+3) output this as a table
+
+```r
+# change location as necessary for project TODO automate
+write.table(rbind(gage.run$greater, gage.run$less), file = paste("/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/", 
+    filename.desc[1], ".xls", sep = ""), sep = "\t")
+```
+
+```
+## Error: object 'gage.run' not found
 ```
 
 

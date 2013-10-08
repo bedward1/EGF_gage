@@ -78,8 +78,8 @@ essential.less <- esset.grp(gage.run$less, data.G1, gsets=path.lib, ref = ans.re
   b) each of these has lists that are the core and essential gene groups (see Vignette)      
 3) output this as a table
 ```{r}
-#change location as necess
-write.table(rbind(analysis.1$greater), file = paste('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/',filename.desc[1],'.xls',collapse=T), sep ="\t") 
+#change location as necessary for project TODO automate 
+write.table(rbind(head(gage.run$greater), head(gage.run$less)), file = paste('/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/',filename.desc[1],'.xls',sep=''), sep ="\t") 
 ```
 
 #save to allow load for next steps

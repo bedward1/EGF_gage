@@ -21,14 +21,18 @@ setwd('~/Documents/R_onAir/GageAnalysis/graphs/')
 
 
 
+
+# input is 'essential.greater' from gage_step1.Rmd
+
+# ** make local folder to save these graphs
+dir.create('/Volumes/Documents-1/R_onAir/EGF_gage analysis/graphs/high')
+setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis/graphs/high')
 # enter as many as I want to graph
-# input is from gage_step1.Rmd
-setwd('/Volumes/Documents-1/R_onAir/EGF_gage analysis/graphs/high_dens/')
-ans.path.ids = c(analysis.esg.greater$essentialSets[[1]],analysis.esg.greater$essentialSets[[2]],analysis.esg.greater$essentialSets[[3]])
+ans.path.ids = c(essential.greater$essentialSets[[3]])
 path.ids=ans.path.ids
 path.ids2 <- substr(path.ids, 1, 8)
 #native KEGG view
-ans.kegg.native = T # F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
+ans.kegg.native = F # **F = Curve KEGG format, T= traiditional Kegg (for some pathways, will only print traditinoal)
 require(pathview)
 # get differences compared to control
 data.output <- data.G1[ ,ans.samp] - data.G1[ ,ans.ref]

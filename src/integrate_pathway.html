@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-<title>Gage pipeline, Step I- calcs</title>
+<title>Integration code for Pathway analysis</title>
 
 <style type="text/css">
 body, td {
@@ -178,179 +178,50 @@ hljs.initHighlightingOnLoad();
 </head>
 
 <body>
-<h1>Gage pipeline, Step I- calcs</h1>
+<h1>Integration code for Pathway analysis</h1>
 
-<p>Started: Bryan Linggi October 2, 2013<br/>
-Updated:<br/>
-Input: Preprocessed data. &#39;Preproc.Rdata&#39; from &#39;diagnostics&#39;<br/>
-Output: results of gage      </p>
+<p>Started: 10/8/13, By Bryan Linggi   </p>
 
-<p><a href="http://www.biomedcentral.com/1471-2105/10/161">link to Gage manuscript</a> </p>
+<p>executed: Tue Oct  8 10:28:51 2013  </p>
 
-<h3>Get pathway library</h3>
-
-<p>if is new pathway library, make in separate script and test</p>
-
-<pre><code class="r">setwd(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/&quot;)
-
-require(&quot;gage&quot;)
+<pre><code class="r">source(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/munge/Preproccessing.Rmd&quot;)
 </code></pre>
 
-<pre><code>## Loading required package: gage
+<pre><code>## Error: 1:4: unexpected symbol
+## 1: I. Data
+##       ^
 </code></pre>
 
-<pre><code class="r">
-data(go.gs)
-data(kegg.gs)
-data(egSymb)
-# make library generic for next steps
-path.lib = kegg.gs  #kegg.gs
-# convert entrez to sym
-
-path.lib = lapply(path.lib, eg2sym)
+<pre><code class="r">source(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/src/initial_analysis.Rmd&quot;)
 </code></pre>
 
-<h3>Import data from preproccessing folder</h3>
-
-<pre><code class="r">load(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/init_analysis_output.Rdata&quot;)
+<pre><code>## Error: 1:9: unexpected symbol
+## 1: Initial analysis
+##            ^
 </code></pre>
 
-<pre><code>## Warning: cannot open compressed file
-## &#39;/Volumes/Documents-1/R_onAir/EGF_gage
-## analysis/tests/init_analysis_output.Rdata&#39;, probable reason &#39;No such file
-## or directory&#39;
+<pre><code class="r">source(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/src/gage_step1.Rmd&quot;)
 </code></pre>
 
-<pre><code>## Error: cannot open the connection
+<pre><code>## Error: 1:6: unexpected symbol
+## 1: Gage pipeline
+##         ^
 </code></pre>
 
-<pre><code class="r">
-# make data generic for next steps WARNING: row names and data must be
-# correct for the next line
-
-# for this data, need to get rid of bracketint &#39; &#39; &#39;
-row.names(ws) = sub(&quot;&#39;&quot;, &quot;&quot;, sub(&quot;&#39;&quot;, &quot;&quot;, row.names(ws)))
+<pre><code class="r">source(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/src/GageS2.Rmd&quot;)
 </code></pre>
 
-<pre><code>## Error: object &#39;ws&#39; not found
+<pre><code>## Error: 1:6: unexpected symbol
+## 1: Gage step
+##         ^
 </code></pre>
 
-<pre><code class="r">data.G1 = as.matrix(ws)
+<pre><code class="r">source(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/src/KeggVis.Rmd&quot;)
 </code></pre>
 
-<pre><code>## Error: object &#39;ws&#39; not found
-</code></pre>
-
-<pre><code class="r">
-# identify control and test column for comparison
-control.idx = grep(&quot;high.ctrl.none&quot;, colnames(data.G1), ignore.case = T)
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<pre><code class="r">test.idx = grep(&quot;high.egf.none&quot;, colnames(data.G1), ignore.case = T)
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<pre><code class="r"># check
-check.control = print(colnames(data.G1)[control.idx])
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<pre><code class="r">check.treatment = print(colnames(data.G1)[test.idx])
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<p>** gernalized from here on **</p>
-
-<h4>Gage analysis</h4>
-
-<pre><code class="r"># options: called answers
-require(gage)
-ans.same.dir = F
-ans.use.fold = F  # or F is t-statistic
-ans.rank.test = F
-ans.ref = control.idx
-</code></pre>
-
-<pre><code>## Error: object &#39;control.idx&#39; not found
-</code></pre>
-
-<pre><code class="r">ans.samp = test.idx
-</code></pre>
-
-<pre><code>## Error: object &#39;test.idx&#39; not found
-</code></pre>
-
-<pre><code class="r">ans.saaTest = gs.KSTest  # non-parametric
-ans.use.stouffer = T  # p-value normalization method
-ans.compare = &quot;unpaired&quot;  # &#39;paired&#39;, &#39;unpaired&#39;, &#39;1ongroup&#39;,&#39;as.group&#39;
-
-# ****name output file names (describe to identify later )
-
-filename.desc = paste(check.control, check.treatment, ans.same.dir, ans.use.fold, 
-    ans.rank.test, ans.use.stouffer, ans.compare, sep = &quot;_&quot;)
-</code></pre>
-
-<pre><code>## Error: object &#39;check.control&#39; not found
-</code></pre>
-
-<pre><code class="r"># this makes 2 characters. use only 1 TODO fix
-
-gage.run &lt;- gage(data.G1, gsets = path.lib, ref = ans.ref, samp = ans.samp, 
-    same.dir = ans.same.dir, use.fold = ans.use.fold, rank.test = ans.rank.test, 
-    saaTest = ans.saaTest, compare = ans.compare, use.stouffer = ans.use.stouffer)
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<pre><code class="r">
-# to select essential genes in group# these are used in KeggVis.Rmd for
-# pathway viewing
-essential.greater &lt;- esset.grp(gage.run$greater, data.G1, gsets = path.lib, 
-    ref = ans.ref, samp = ans.samp, output = F, make.plot = F, compare = ans.compare, 
-    test4up = T, samedir = ans.same.dir, use.fold = ans.use.fold)
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<pre><code class="r">
-essential.less &lt;- esset.grp(gage.run$less, data.G1, gsets = path.lib, ref = ans.ref, 
-    samp = ans.samp, output = F, make.plot = F, compare = ans.compare, test4up = T, 
-    samedir = ans.same.dir, use.fold = ans.use.fold)
-</code></pre>
-
-<pre><code>## Error: object &#39;data.G1&#39; not found
-</code></pre>
-
-<h3>output</h3>
-
-<p>1)&ldquo;gage.run&rdquo; has the tables &#39;greater&#39; and &#39;less&#39;, and &#39;stats&#39; that show the diff pathways<br/>
-2) essential.greater and essential.less have the pathways that are regulated higher (greater) or lower (less) than controls #TODO figure this out<br/>
-  a) use these as inputs to Kegg.Vis if kegg is use for pathway analysis. TODO, map to other pathways types?<br/>
-  b) each of these has lists that are the core and essential gene groups (see Vignette)<br/>
-3) output this as a table</p>
-
-<pre><code class="r"># change location as necessary for project TODO automate
-write.table(rbind(gage.run$greater, gage.run$less), file = paste(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/&quot;, 
-    filename.desc[1], &quot;.xls&quot;, sep = &quot;&quot;), sep = &quot;\t&quot;)
-</code></pre>
-
-<pre><code>## Error: object &#39;gage.run&#39; not found
-</code></pre>
-
-<p>#save to allow load for next steps</p>
-
-<pre><code class="r">save.image(&quot;/Volumes/Documents-1/R_onAir/EGF_gage analysis/tests/gageS1_output.Rdata &quot;)
+<pre><code>## Error: 1:15: unexpected symbol
+## 1: Visualization of
+##                  ^
 </code></pre>
 
 </body>

@@ -97,7 +97,7 @@ summary.ws.v2 = print(summary(ws))
 # #### Recode variables    
 
   ```{r}
- ws.v2.factored=ws.v2
+ #ws.v2.factored=ws.v2
        # make vector to id all columns to factor except response variable
        idx=1:ncol(ws.v2)
        idx = idx[-21]  # idx of response var
